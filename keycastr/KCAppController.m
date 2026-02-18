@@ -49,6 +49,7 @@ static NSString* kKCPrefCapturingHotKey = @"capturingHotKey";
 static NSString* kKCPrefVisibleAtLaunch = @"alwaysShowPrefs";
 static NSString* kKCPrefDisplayIcon = @"displayIcon";
 static NSString* kKCPrefSelectedVisualizer = @"selectedVisualizer";
+static NSString* kKCPrefFilterSyntheticKeys = @"filterSyntheticKeys";
 static NSString* kKCSupplementalAlertText = @"\n\nPlease grant KeyCastr access to the Accessibility and/or Input Monitoring API in order to broadcast your keyboard inputs.\n\nWithin the System Preferences application, open the Security & Privacy preferences and add KeyCastr to the Accessibility and/or Input Monitoring list within the Privacy tab. If KeyCastr is already listed under the menus, please remove it and try again.\n";
 
 static NSInteger kKCPrefDisplayIconInMenuBar = 0x01;
@@ -62,6 +63,7 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
 @property (nonatomic, assign) NSInteger prefDisplayIcon;
 @property (nonatomic, assign) BOOL showInDock;
 @property (nonatomic, assign) BOOL showInMenuBar;
+@property (nonatomic, assign) BOOL filterSyntheticKeys;
 @property (nonatomic, strong) SRShortcut *toggleCastingShortcut;
 
 @property (nonatomic, assign) IBOutlet NSMenu *statusMenu;
@@ -120,6 +122,11 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
 
     [[NSUserDefaults standardUserDefaults] addObserver:self
                                             forKeyPath:kKCPrefDisplayIcon
+                                               options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew)
+                                               context:nil];
+
+    [[NSUserDefaults standardUserDefaults] addObserver:self
+                                            forKeyPath:kKCPrefFilterSyntheticKeys
                                                options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew)
                                                context:nil];
 }
@@ -222,7 +229,8 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     NSDictionary *appDefaults = @{ kKCPrefDisplayIcon: @3,
                                    kKCPrefSelectedVisualizer: @"Default",
                                    kKCPrefVisibleAtLaunch: @YES,
-                                   kKCPrefCapturingHotKey: [NSData dataWithBytes:&keyCombo length:sizeof(keyCombo)] };
+                                   kKCPrefCapturingHotKey: [NSData dataWithBytes:&keyCombo length:sizeof(keyCombo)],
+                                   kKCPrefFilterSyntheticKeys: @NO };
     
     NSArray *factories = [KCVisualizer availableVisualizerFactories];
     NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
@@ -506,6 +514,9 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     if ([keyPath isEqualToString:kKCPrefDisplayIcon]) {
         [self prefDisplayIconUpdatedTo:[[change objectForKey:NSKeyValueChangeNewKey] integerValue]];
     }
+    else if ([keyPath isEqualToString:kKCPrefFilterSyntheticKeys]) {
+        eventTap.filterSyntheticKeystrokes = [[change objectForKey:NSKeyValueChangeNewKey] boolValue];
+    }
     else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
@@ -536,6 +547,14 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
 
 -(void) setShowInMenuBar:(BOOL)showInMenuBar {
     self.prefDisplayIcon = (self.prefDisplayIcon & ~kKCPrefDisplayIconInMenuBar) | (showInMenuBar ? kKCPrefDisplayIconInMenuBar : 0);
+}
+
+-(BOOL) filterSyntheticKeys {
+    return [NSUserDefaults.standardUserDefaults boolForKey:kKCPrefFilterSyntheticKeys];
+}
+
+-(void) setFilterSyntheticKeys:(BOOL)filterSyntheticKeys {
+    [NSUserDefaults.standardUserDefaults setBool:filterSyntheticKeys forKey:kKCPrefFilterSyntheticKeys];
 }
 
 #pragma mark -

@@ -222,6 +222,13 @@ CGEventRef mouseAndFlagsEventTapCallback(
 {
     NSEvent *event = [NSEvent eventWithCGEvent:eventRef];
     KCKeystroke* keystroke = [KCKeystroke eventWithNSEvent:event];
+
+    // When filtering is enabled, ignore synthetic keystrokes (e.g. from Talon Voice).
+    // Real hardware keystrokes have bit 8 (0x100) set in modifierFlags; synthetic ones don't.
+    if (self.filterSyntheticKeystrokes && (keystroke.modifierFlags & 0x100) == 0) {
+        return;
+    }
+
     [self noteKeystroke:keystroke];
 }
 

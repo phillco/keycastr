@@ -36,6 +36,7 @@
 
 @property (nonatomic, assign) id<KCEventTapDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL tapInstalled;
+@property (nonatomic, assign) BOOL filterSyntheticKeystrokes;
 
 - (BOOL)installTapWithError:(NSError **)error;
 - (void)removeTap;

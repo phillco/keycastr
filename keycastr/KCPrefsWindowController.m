@@ -163,6 +163,32 @@
 	[prefsWindow setToolbar:toolbar];
 
 	NSView* currentView = [preferenceViews objectAtIndex:0];
+
+	// Add "Filter synthetic keystrokes" checkbox to the General pane
+	NSButton *filterCheckbox = [[[NSButton alloc] initWithFrame:NSZeroRect] autorelease];
+	[filterCheckbox setButtonType:NSButtonTypeSwitch];
+	[filterCheckbox setTitle:@"Ignore synthetic keystrokes (e.g. Talon Voice)"];
+	[filterCheckbox sizeToFit];
+	NSRect checkboxFrame = [filterCheckbox frame];
+	checkboxFrame.origin.x = 18;
+	checkboxFrame.origin.y = 10;
+	[filterCheckbox setFrame:checkboxFrame];
+	[filterCheckbox bind:NSValueBinding toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.filterSyntheticKeys" options:nil];
+
+	// Expand the General view to fit the checkbox
+	NSSize generalSize = [currentView frame].size;
+	generalSize.height += checkboxFrame.size.height + 20;
+	[currentView setFrameSize:generalSize];
+
+	// Shift existing subviews up to make room at the bottom
+	for (NSView *subview in [currentView subviews]) {
+		NSRect frame = [subview frame];
+		frame.origin.y += checkboxFrame.size.height + 20;
+		[subview setFrame:frame];
+	}
+
+	[currentView addSubview:filterCheckbox];
+
 	[prefsWindow setTitle:@"General"];
 	[prefsWindow setContentSize:[currentView frame].size];
 	[prefsWindow center];
