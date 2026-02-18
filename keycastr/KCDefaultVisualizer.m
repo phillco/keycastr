@@ -550,8 +550,27 @@ static const int kKCBezelBorder = 6;
 	NSBezierPath *bgPath = [NSBezierPath bezierPath];
 	[bgPath appendRoundedRect:frame radius:16];
 
-	// Re-read color from defaults so in-flight bezels pick up live changes (e.g. mode color sync)
-	NSColor *bgColor = [[NSUserDefaults standardUserDefaults] colorForKey:@"default.bezelColor"] ?: _backgroundColor;
+	// Check for hex color override file (fast path for external integrations like Talon mode sync).
+	// Written by external tools to /tmp/keycastr-bezel-color as a hex string like "#007777CC".
+	NSColor *bgColor = nil;
+	NSString *hexOverride = [NSString stringWithContentsOfFile:@"/tmp/keycastr-bezel-color" encoding:NSUTF8StringEncoding error:NULL];
+	hexOverride = [hexOverride stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if (hexOverride.length >= 7) {
+		unsigned int r = 0, g = 0, b = 0, a = 255;
+		NSString *hex = [hexOverride stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
+		if (hex.length >= 6) {
+			[[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(0, 2)]] scanHexInt:&r];
+			[[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(2, 2)]] scanHexInt:&g];
+			[[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(4, 2)]] scanHexInt:&b];
+			if (hex.length >= 8) {
+				[[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(6, 2)]] scanHexInt:&a];
+			}
+			bgColor = [NSColor colorWithSRGBRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0];
+		}
+	}
+	if (!bgColor) {
+		bgColor = [[NSUserDefaults standardUserDefaults] colorForKey:@"default.bezelColor"] ?: _backgroundColor;
+	}
 	[[bgColor colorWithAlphaComponent:_opacity * [bgColor alphaComponent]] setFill];
 	[bgPath fill];
 
