@@ -655,6 +655,56 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     [NSUserDefaults.standardUserDefaults setFloat:delay forKey:@"default.keystrokeDelay"];
 }
 
+#pragma mark - Color helpers
+
+static NSString *hexStringFromColorKey(NSString *key) {
+    NSData *data = [NSUserDefaults.standardUserDefaults dataForKey:key];
+    if (!data) return @"#000000";
+    NSColor *color = [NSKeyedUnarchiver unarchivedObjectOfClass:[NSColor class] fromData:data error:NULL];
+    if (!color) return @"#000000";
+    color = [color colorUsingColorSpace:NSColorSpace.sRGBColorSpace];
+    CGFloat r, g, b, a;
+    [color getRed:&r green:&g blue:&b alpha:&a];
+    if (a < 1.0) {
+        return [NSString stringWithFormat:@"#%02X%02X%02X%02X",
+                (int)(r * 255), (int)(g * 255), (int)(b * 255), (int)(a * 255)];
+    }
+    return [NSString stringWithFormat:@"#%02X%02X%02X",
+            (int)(r * 255), (int)(g * 255), (int)(b * 255)];
+}
+
+static void setColorKeyFromHex(NSString *key, NSString *hex) {
+    hex = [hex stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
+    unsigned int r = 0, g = 0, b = 0, a = 255;
+    if (hex.length >= 6) {
+        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(0, 2)]] scanHexInt:&r];
+        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(2, 2)]] scanHexInt:&g];
+        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(4, 2)]] scanHexInt:&b];
+    }
+    if (hex.length >= 8) {
+        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(6, 2)]] scanHexInt:&a];
+    }
+    NSColor *color = [NSColor colorWithSRGBRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0];
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:color requiringSecureCoding:NO error:NULL];
+    [NSUserDefaults.standardUserDefaults setObject:data forKey:key];
+}
+
+-(NSString *) bezelColor {
+    return hexStringFromColorKey(@"default.bezelColor");
+}
+
+-(void) setBezelColor:(NSString *)hex {
+    setColorKeyFromHex(@"default.bezelColor", hex);
+}
+
+-(NSString *) textColor {
+    return hexStringFromColorKey(@"default.textColor");
+}
+
+-(void) setTextColor:(NSString *)hex {
+    setColorKeyFromHex(@"default.textColor", hex);
+}
+
 #pragma mark -
 #pragma mark SRRecorderControlDelegate methods
 
@@ -680,6 +730,7 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
             @"casting", @"filterSyntheticKeys", @"showInDock", @"showInMenuBar",
             @"currentVisualizerName", @"keyDisplayMode", @"currentMouseDisplayOptionName",
             @"displayFontSize", @"displayFadeDelay", @"displayFadeDuration", @"displayKeystrokeDelay",
+            @"bezelColor", @"textColor",
             nil];
     }
     return [scriptableKeys containsObject:key];

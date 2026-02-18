@@ -60,6 +60,16 @@
                       description="Seconds to wait before starting a new bezel for subsequent keystrokes.">
                 <cocoa key="displayKeystrokeDelay"/>
             </property>
+
+            <property name="bezel color" code="KCbc" type="text" access="rw"
+                      description="Background color of the keystroke bezel as hex: &quot;#RRGGBB&quot; or &quot;#RRGGBBAA&quot;.">
+                <cocoa key="bezelColor"/>
+            </property>
+
+            <property name="text color" code="KCtc" type="text" access="rw"
+                      description="Text color of the keystroke display as hex: &quot;#RRGGBB&quot; or &quot;#RRGGBBAA&quot;.">
+                <cocoa key="textColor"/>
+            </property>
         </class>
 
         <command name="start casting" code="KCstStrt" description="Start capturing and displaying keystrokes.">
