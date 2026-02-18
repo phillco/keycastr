@@ -540,6 +540,7 @@ static const int kKCBezelBorder = 6;
 {
 	_opacity = opacity;
 	[_textStorage setAttributes:[self attributes] range:NSMakeRange(0, [_textStorage length])];
+	[self setNeedsDisplay:YES];
 }
 
 -(void) drawRect:(NSRect)r
@@ -549,7 +550,9 @@ static const int kKCBezelBorder = 6;
 	NSBezierPath *bgPath = [NSBezierPath bezierPath];
 	[bgPath appendRoundedRect:frame radius:16];
 
-	[[_backgroundColor colorWithAlphaComponent:_opacity * [_backgroundColor alphaComponent]] setFill];
+	// Re-read color from defaults so in-flight bezels pick up live changes (e.g. mode color sync)
+	NSColor *bgColor = [[NSUserDefaults standardUserDefaults] colorForKey:@"default.bezelColor"] ?: _backgroundColor;
+	[[bgColor colorWithAlphaComponent:_opacity * [bgColor alphaComponent]] setFill];
 	[bgPath fill];
 
 	[_layoutManager drawGlyphsForGlyphRange:NSMakeRange(0,[_textStorage length]) atPoint:NSMakePoint(kKCBezelBorder, kKCBezelBorder)];
