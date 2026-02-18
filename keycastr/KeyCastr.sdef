@@ -25,6 +25,41 @@
                       description="Show KeyCastr icon in the menu bar.">
                 <cocoa key="showInMenuBar"/>
             </property>
+
+            <property name="display style" code="KCds" type="text" access="rw"
+                      description="The visualizer style: &quot;Default&quot; or &quot;Svelte&quot;.">
+                <cocoa key="currentVisualizerName"/>
+            </property>
+
+            <property name="key display mode" code="KCkd" type="text" access="rw"
+                      description="Which keys to display: &quot;Command Keys Only&quot;, &quot;All Modified Keys&quot;, or &quot;All Keys&quot;.">
+                <cocoa key="keyDisplayMode"/>
+            </property>
+
+            <property name="mouse display mode" code="KCmd" type="text" access="rw"
+                      description="Mouse click display: &quot;None&quot;, &quot;With Mouse Pointer&quot;, &quot;With Current Visualizer&quot;, or &quot;With Pointer and Visualizer&quot;.">
+                <cocoa key="currentMouseDisplayOptionName"/>
+            </property>
+
+            <property name="font size" code="KCfz" type="real" access="rw"
+                      description="Font size for the keystroke display bezel.">
+                <cocoa key="displayFontSize"/>
+            </property>
+
+            <property name="fade delay" code="KCfd" type="real" access="rw"
+                      description="Seconds before the keystroke display begins to fade.">
+                <cocoa key="displayFadeDelay"/>
+            </property>
+
+            <property name="fade duration" code="KCfn" type="real" access="rw"
+                      description="Duration of the fade-out animation in seconds.">
+                <cocoa key="displayFadeDuration"/>
+            </property>
+
+            <property name="keystroke delay" code="KCky" type="real" access="rw"
+                      description="Seconds to wait before starting a new bezel for subsequent keystrokes.">
+                <cocoa key="displayKeystrokeDelay"/>
+            </property>
         </class>
 
         <command name="start casting" code="KCstStrt" description="Start capturing and displaying keystrokes.">

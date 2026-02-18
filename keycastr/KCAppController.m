@@ -604,6 +604,57 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     [NSUserDefaults.standardUserDefaults setBool:filterSyntheticKeys forKey:kKCPrefFilterSyntheticKeys];
 }
 
+#pragma mark - Display settings (AppleScript accessors)
+
+-(NSString *) keyDisplayMode {
+    NSUserDefaults *ud = NSUserDefaults.standardUserDefaults;
+    if ([ud boolForKey:@"default.commandKeysOnly"]) return @"Command Keys Only";
+    if ([ud boolForKey:@"default.allModifiedKeys"]) return @"All Modified Keys";
+    return @"All Keys";
+}
+
+-(void) setKeyDisplayMode:(NSString *)modeName {
+    NSUserDefaults *ud = NSUserDefaults.standardUserDefaults;
+    BOOL commandOnly = [modeName isEqualToString:@"Command Keys Only"];
+    BOOL allModified = [modeName isEqualToString:@"All Modified Keys"];
+    BOOL allKeys = [modeName isEqualToString:@"All Keys"];
+    [ud setBool:commandOnly forKey:@"default.commandKeysOnly"];
+    [ud setBool:allModified forKey:@"default.allModifiedKeys"];
+    [ud setBool:allKeys forKey:@"default.allKeys"];
+}
+
+-(CGFloat) displayFontSize {
+    return [NSUserDefaults.standardUserDefaults floatForKey:@"default.fontSize"];
+}
+
+-(void) setDisplayFontSize:(CGFloat)size {
+    [NSUserDefaults.standardUserDefaults setFloat:size forKey:@"default.fontSize"];
+}
+
+-(CGFloat) displayFadeDelay {
+    return [NSUserDefaults.standardUserDefaults floatForKey:@"default.fadeDelay"];
+}
+
+-(void) setDisplayFadeDelay:(CGFloat)delay {
+    [NSUserDefaults.standardUserDefaults setFloat:delay forKey:@"default.fadeDelay"];
+}
+
+-(CGFloat) displayFadeDuration {
+    return [NSUserDefaults.standardUserDefaults floatForKey:@"default.fadeDuration"];
+}
+
+-(void) setDisplayFadeDuration:(CGFloat)duration {
+    [NSUserDefaults.standardUserDefaults setFloat:duration forKey:@"default.fadeDuration"];
+}
+
+-(CGFloat) displayKeystrokeDelay {
+    return [NSUserDefaults.standardUserDefaults floatForKey:@"default.keystrokeDelay"];
+}
+
+-(void) setDisplayKeystrokeDelay:(CGFloat)delay {
+    [NSUserDefaults.standardUserDefaults setFloat:delay forKey:@"default.keystrokeDelay"];
+}
+
 #pragma mark -
 #pragma mark SRRecorderControlDelegate methods
 
@@ -626,7 +677,10 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     static NSSet *scriptableKeys = nil;
     if (!scriptableKeys) {
         scriptableKeys = [NSSet setWithObjects:
-            @"casting", @"filterSyntheticKeys", @"showInDock", @"showInMenuBar", nil];
+            @"casting", @"filterSyntheticKeys", @"showInDock", @"showInMenuBar",
+            @"currentVisualizerName", @"keyDisplayMode", @"currentMouseDisplayOptionName",
+            @"displayFontSize", @"displayFadeDelay", @"displayFadeDuration", @"displayKeystrokeDelay",
+            nil];
     }
     return [scriptableKeys containsObject:key];
 }
