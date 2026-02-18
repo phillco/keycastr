@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+<dictionary title="KeyCastr Terminology">
+    <suite name="KeyCastr Suite" code="KCst" description="KeyCastr scripting support.">
+
+        <class name="application" code="capp" description="The KeyCastr application.">
+            <cocoa class="NSApplication"/>
+
+            <property name="casting" code="KCca" type="boolean" access="rw"
+                      description="Is KeyCastr currently capturing and displaying keystrokes?">
+                <cocoa key="casting"/>
+            </property>
+
+            <property name="filter synthetic keystrokes" code="KCfs" type="boolean" access="rw"
+                      description="When enabled, ignores synthetic keystrokes (e.g. from Talon Voice).">
+                <cocoa key="filterSyntheticKeys"/>
+            </property>
+
+            <property name="show in dock" code="KCsd" type="boolean" access="rw"
+                      description="Show KeyCastr icon in the Dock.">
+                <cocoa key="showInDock"/>
+            </property>
+
+            <property name="show in menu bar" code="KCsm" type="boolean" access="rw"
+                      description="Show KeyCastr icon in the menu bar.">
+                <cocoa key="showInMenuBar"/>
+            </property>
+        </class>
+
+        <command name="start casting" code="KCstStrt" description="Start capturing and displaying keystrokes.">
+            <cocoa class="KCStartCastingCommand"/>
+        </command>
+
+        <command name="stop casting" code="KCstStop" description="Stop capturing and displaying keystrokes.">
+            <cocoa class="KCStopCastingCommand"/>
+        </command>
+
+        <command name="toggle casting" code="KCstTogl" description="Toggle keystroke capturing on or off.">
+            <cocoa class="KCToggleCastingCommand"/>
+        </command>
+
+    </suite>
+</dictionary>

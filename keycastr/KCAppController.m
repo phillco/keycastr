@@ -80,6 +80,45 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
 
 @end
 
+// Forward-declare for AppleScript command classes
+@interface KCAppController ()
+- (BOOL)casting;
+- (void)setCasting:(BOOL)casting;
+@end
+
+// AppleScript command classes
+
+@interface KCStartCastingCommand : NSScriptCommand
+@end
+
+@implementation KCStartCastingCommand
+- (id)performDefaultImplementation {
+    [(KCAppController *)[NSApp delegate] setCasting:YES];
+    return nil;
+}
+@end
+
+@interface KCStopCastingCommand : NSScriptCommand
+@end
+
+@implementation KCStopCastingCommand
+- (id)performDefaultImplementation {
+    [(KCAppController *)[NSApp delegate] setCasting:NO];
+    return nil;
+}
+@end
+
+@interface KCToggleCastingCommand : NSScriptCommand
+@end
+
+@implementation KCToggleCastingCommand
+- (id)performDefaultImplementation {
+    KCAppController *controller = (KCAppController *)[NSApp delegate];
+    [controller setCasting:![controller casting]];
+    return nil;
+}
+@end
+
 @implementation KCAppController {
     BOOL _isCapturing;
 }
@@ -549,6 +588,14 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     self.prefDisplayIcon = (self.prefDisplayIcon & ~kKCPrefDisplayIconInMenuBar) | (showInMenuBar ? kKCPrefDisplayIconInMenuBar : 0);
 }
 
+-(BOOL) casting {
+    return _isCapturing;
+}
+
+-(void) setCasting:(BOOL)casting {
+    [self setIsCapturing:casting];
+}
+
 -(BOOL) filterSyntheticKeys {
     return [NSUserDefaults.standardUserDefaults boolForKey:kKCPrefFilterSyntheticKeys];
 }
@@ -570,6 +617,18 @@ static NSInteger kKCPrefDisplayIconInDock = 0x02;
     self.toggleCastingShortcut = newShortcut;
     [shortcutRecorder setObjectValue:newShortcut];
     [self updateToggleShortcutDisplay:newShortcut];
+}
+
+#pragma mark -
+#pragma mark AppleScript support
+
+- (BOOL)application:(NSApplication *)sender delegateHandlesKey:(NSString *)key {
+    static NSSet *scriptableKeys = nil;
+    if (!scriptableKeys) {
+        scriptableKeys = [NSSet setWithObjects:
+            @"casting", @"filterSyntheticKeys", @"showInDock", @"showInMenuBar", nil];
+    }
+    return [scriptableKeys containsObject:key];
 }
 
 @end
